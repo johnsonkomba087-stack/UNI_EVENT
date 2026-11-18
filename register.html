@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus text-primary display-5"></i>
+                        <h3 class="fw-bold mt-2">Create Account</h3>
+                        <p class="text-muted small">Join UniEvents to discover and register for campus events</p>
+                    </div>
+
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="full_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Username *</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Department</label>
+                                <input type="text" name="department" class="form-control" placeholder="e.g. Computer Science">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Role</label>
+                                <select name="role" class="form-select">
+                                    <option value="student">Student</option>
+                                    <option value="organizer">Organizer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password *</label>
+                                <input type="password" name="password" class="form-control" required minlength="6">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password *</label>
+                                <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 mt-4">Create Account</button>
+                    </form>
+
+                    <p class="text-center mt-4 mb-0 small">
+                        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

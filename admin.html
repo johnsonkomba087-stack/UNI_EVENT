@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="fw-bold mb-4"><i class="bi bi-shield-lock"></i> Admin Dashboard</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body py-3">
+                    <h3 class="fw-bold text-primary mb-0">{{ users|length }}</h3>
+                    <small class="text-muted">Users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body py-3">
+                    <h3 class="fw-bold text-success mb-0">{{ events|length }}</h3>
+                    <small class="text-muted">Events</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body py-3">
+                    <h3 class="fw-bold text-info mb-0">{{ total_regs }}</h3>
+                    <small class="text-muted">Active Registrations</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-people"></i> Users
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td class="fw-semibold">{{ u.username }}</td>
+                            <td>{{ u.full_name }}</td>
+                            <td class="small">{{ u.email }}</td>
+                            <td>
+                                {% if u.role == 'admin' %}
+                                <span class="badge bg-danger">admin</span>
+                                {% elif u.role == 'organizer' %}
+                                <span class="badge bg-warning text-dark">organizer</span>
+                                {% else %}
+                                <span class="badge bg-secondary">student</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ u.department or '—' }}</td>
+                            <td class="small">{{ u.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                {% if u.id != user.id %}
+                                <form method="POST" action="{{ url_for('toggle_role', user_id=u.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Cycle role">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=u.id) }}" class="d-inline"
+                                      onsubmit="return confirm('Delete user {{ u.username }}?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted small">You</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-calendar-event"></i> All Events
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Organizer</th>
+                            <th>Date</th>
+                            <th>Regs</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in events %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('event_detail', event_id=e.id) }}" class="text-decoration-none fw-semibold">
+                                    {{ e.title }}
+                                </a>
+                            </td>
+                            <td><span class="badge bg-primary">{{ e.category }}</span></td>
+                            <td class="small">{{ e.organizer.full_name }}</td>
+                            <td class="small">{{ e.start_time.strftime('%b %d, %Y') }}</td>
+                            <td>{{ e.registered_count }}/{{ e.capacity }}</td>
+                            <td>
+                                {% if e.status == 'upcoming' %}
+                                <span class="badge bg-success">Upcoming</span>
+                                {% elif e.status == 'ongoing' %}
+                                <span class="badge bg-warning text-dark">Ongoing</span>
+                                {% elif e.status == 'completed' %}
+                                <span class="badge bg-secondary">Completed</span>
+                                {% else %}
+                                <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_event', event_id=e.id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}My Events{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="fw-bold mb-4"><i class="bi bi-bookmark-check"></i> My Events</h2>
+
+    <!-- Registered Events -->
+    <h5 class="fw-semibold mb-3">Events I'm Attending</h5>
+    {% if registrations %}
+    <div class="row g-3 mb-5">
+        {% for reg in registrations %}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span class="badge bg-primary">{{ reg.event.category }}</span>
+                        <span class="badge bg-success">Registered</span>
+                    </div>
+                    <h5 class="mt-2 mb-1">
+                        <a href="{{ url_for('event_detail', event_id=reg.event.id) }}" class="text-decoration-none text-dark">
+                            {{ reg.event.title }}
+                        </a>
+                    </h5>
+                    <p class="small text-muted mb-2">
+                        <i class="bi bi-calendar3"></i> {{ reg.event.start_time.strftime('%b %d, %Y · %H:%M') }}
+                        &nbsp;·&nbsp;
+                        <i class="bi bi-geo-alt"></i> {{ reg.event.location }}
+                    </p>
+                    <p class="small text-muted mb-0">Registered on {{ reg.registered_at.strftime('%b %d, %Y') }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-light border text-center py-4 mb-5">
+        <i class="bi bi-ticket-perforated display-6 text-muted"></i>
+        <p class="mt-2 mb-0 text-muted">You haven't registered for any events yet.</p>
+        <a href="{{ url_for('events') }}" class="btn btn-sm btn-primary mt-2">Browse Events</a>
+    </div>
+    {% endif %}
+
+    <!-- Waitlist -->
+    {% if waitlisted %}
+    <h5 class="fw-semibold mb-3">Waitlisted Events</h5>
+    <div class="row g-3 mb-5">
+        {% for reg in waitlisted %}
+        <div class="col-md-6">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark">Waitlisted</span>
+                    <h5 class="mt-2">
+                        <a href="{{ url_for('event_detail', event_id=reg.event.id) }}" class="text-decoration-none text-dark">
+                            {{ reg.event.title }}
+                        </a>
+                    </h5>
+                    <p class="small text-muted mb-0">
+                        {{ reg.event.start_time.strftime('%b %d, %Y · %H:%M') }} · {{ reg.event.location }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Created Events (for organizers) -->
+    {% if user.role in ['organizer', 'admin'] %}
+    <h5 class="fw-semibold mb-3">Events I Created</h5>
+    {% if created_events %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Registrations</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in created_events %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="fw-semibold text-decoration-none">
+                            {{ event.title }}
+                        </a>
+                    </td>
+                    <td><span class="badge bg-primary">{{ event.category }}</span></td>
+                    <td class="small">{{ event.start_time.strftime('%b %d, %Y') }}</td>
+                    <td>{{ event.registered_count }}/{{ event.capacity }}</td>
+                    <td>
+                        {% if event.status == 'upcoming' %}
+                        <span class="badge bg-success">Upcoming</span>
+                        {% elif event.status == 'ongoing' %}
+                        <span class="badge bg-warning text-dark">Ongoing</span>
+                        {% elif event.status == 'completed' %}
+                        <span class="badge bg-secondary">Completed</span>
+                        {% else %}
+                        <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-light border text-center py-4">
+        <p class="mb-0 text-muted">You haven't created any events yet.</p>
+        <a href="{{ url_for('create_event') }}" class="btn btn-sm btn-primary mt-2">Create Event</a>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

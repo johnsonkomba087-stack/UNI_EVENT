@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('events') }}">Events</a></li>
+            <li class="breadcrumb-item active">{{ event.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-primary fs-6">{{ event.category }}</span>
+                        {% if event.status == 'upcoming' %}
+                        <span class="badge bg-success fs-6">Upcoming</span>
+                        {% elif event.status == 'ongoing' %}
+                        <span class="badge bg-warning text-dark fs-6">Ongoing</span>
+                        {% elif event.status == 'completed' %}
+                        <span class="badge bg-secondary fs-6">Completed</span>
+                        {% else %}
+                        <span class="badge bg-danger fs-6">Cancelled</span>
+                        {% endif %}
+                    </div>
+
+                    <h1 class="h2 fw-bold mb-3">{{ event.title }}</h1>
+                    {% if event.image_url %}
+                    <img src="{{ event.image_url }}" class="img-fluid rounded mb-4" alt="{{ event.title }}">
+                    {% endif %}
+
+                    <div class="row g-3 mb-4 text-muted">
+                        <div class="col-sm-6">
+                            <i class="bi bi-calendar3 text-primary"></i>
+                            <strong>Start:</strong> {{ event.start_time.strftime('%A, %b %d, %Y at %H:%M') }}
+                        </div>
+                        <div class="col-sm-6">
+                            <i class="bi bi-calendar3 text-primary"></i>
+                            <strong>End:</strong> {{ event.end_time.strftime('%A, %b %d, %Y at %H:%M') }}
+                        </div>
+                        <div class="col-sm-6">
+                            <i class="bi bi-geo-alt text-primary"></i>
+                            <strong>Location:</strong> {{ event.location }}
+                        </div>
+                        <div class="col-sm-6">
+                            <i class="bi bi-person text-primary"></i>
+                            <strong>Organizer:</strong> {{ event.organizer.full_name }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-semibold">About this event</h5>
+                    <p class="text-secondary" style="white-space: pre-line;">{{ event.description }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 80px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Registration</h5>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>Capacity</span>
+                            <span>{{ event.registered_count }} / {{ event.capacity }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            {% set pct = (event.registered_count / event.capacity * 100) if event.capacity > 0 else 0 %}
+                            <div class="progress-bar {% if pct >= 100 %}bg-danger{% elif pct >= 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 style="width: {{ pct }}%"></div>
+                        </div>
+                        <p class="small text-muted mt-1 mb-0">
+                            {% if event.is_full %}
+                            <span class="text-danger fw-semibold">Event is full</span>
+                            {% else %}
+                            {{ event.spots_left }} spot{{ 's' if event.spots_left != 1 else '' }} left
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if user %}
+                        {% if is_registered %}
+                        <div class="alert alert-success py-2 small">
+                            <i class="bi bi-check-circle"></i> You are registered
+                        </div>
+                        <div class="text-center mb-3">
+                            <img src="{{ url_for('event_qr', event_id=event.id) }}" alt="Event check-in QR code"
+                                 class="img-fluid border rounded p-2" style="max-width: 220px;">
+                            <div class="small text-muted mt-1">Show this QR code at check-in</div>
+                        </div>
+                        <form method="POST" action="{{ url_for('unregister_event', event_id=event.id) }}">
+                            <button type="submit" class="btn btn-outline-danger w-100" 
+                                    onclick="return confirm('Unregister from this event?')">
+                                Unregister
+                            </button>
+                        </form>
+                        {% elif is_waitlisted %}
+                        <div class="alert alert-warning py-2 small">
+                            <i class="bi bi-hourglass-split"></i> You are on the waitlist
+                        </div>
+                        <form method="POST" action="{{ url_for('leave_waitlist', event_id=event.id) }}">
+                            <button type="submit" class="btn btn-outline-secondary w-100">Leave Waitlist</button>
+                        </form>
+                        {% elif event.status in ['upcoming', 'ongoing'] %}
+                        <form method="POST" action="{{ url_for('register_event', event_id=event.id) }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-ticket-perforated"></i>
+                                {% if event.is_full %}Join Waitlist{% else %}Register Now{% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary w-100" disabled>Registration Closed</button>
+                        {% endif %}
+                    {% else %}
+                        <p class="small text-muted">Please login to register for this event.</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary w-100">Login to Register</a>
+                    {% endif %}
+
+                    {% if user and (user.role == 'admin' or event.created_by == user.id) %}
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-pencil"></i> Edit Event
+                        </a>
+                        <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100"
+                                    onclick="return confirm('Delete this event permanently?')">
+                                <i class="bi bi-trash"></i> Delete Event
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Calendar{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold mb-0"><i class="bi bi-calendar-week"></i> Event Calendar</h2>
+        <a href="{{ url_for('events') }}" class="btn btn-outline-primary btn-sm">List View</a>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div id="eventCalendar"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendar = new FullCalendar.Calendar(document.getElementById('eventCalendar'), {
+            initialView: 'dayGridMonth',
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            events: {{ url_for('api_calendar_events') | tojson }},
+            eventDisplay: 'block'
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

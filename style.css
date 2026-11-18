@@ -1,0 +1,118 @@
+/* UniEvents Custom Styles */
+
+:root {
+    --primary: #0d6efd;
+    --primary-dark: #0a58ca;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+/* Hero */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 50%, #084298 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Cards */
+.event-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+}
+
+.event-img {
+    height: 140px;
+}
+
+.category-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.stat-card {
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Navbar */
+.navbar-brand {
+    letter-spacing: -0.5px;
+}
+
+/* Forms */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* Progress bar */
+.progress {
+    border-radius: 4px;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Badge spacing */
+.badge {
+    font-weight: 500;
+}
+
+/* Table */
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6c757d;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .hero-section h1 {
+        font-size: 1.8rem;
+    }
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+}
